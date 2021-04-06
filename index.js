@@ -9,10 +9,18 @@ const puppeteer = require('puppeteer');
 
     const episodeTitileElements = await page.$$('td.episode-title a.fl-l.fw-b');
     const episodeTitiles = [];
-    await episodeTitileElements.forEach(tag => {
+    
+    for await (let episodeTitle of extractTitle(episodeTitileElements))
+        episodeTitiles.push(episodeTitle)
 
-        let name = tag.evaluate(node => node.innerText)
-        name.then(i => console.log(i))
-    })
+    console.log(episodeTitiles)
+
     browser.close();
 })();
+
+async function* extractTitle(tags) {
+    for(let i=0;i<tags.length;++i){
+        let tagText = await tags[i].evaluate(tagNode => tagNode.innerText)
+        yield tagText
+    }
+}
